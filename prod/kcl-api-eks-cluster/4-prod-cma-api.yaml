@@ -1,0 +1,53 @@
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kcl-api
+  namespace: api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: kcl-api
+  template:
+    metadata:
+      labels:
+        app: kcl-api
+    spec:
+      volumes:                                  
+        - name: tz-config                       
+          hostPath:                             
+            path: /usr/share/zoneinfo/Asia/Seoul
+            type: ''
+      dnsPolicy: Default
+      containers:
+      - image: 123456789.dkr.ecr.ap-northeast-2.amazonaws.com/my_ecr:latest
+        name: kcl-api
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+          name: http
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          value: prod
+        volumeMounts:                  
+            - name: tz-config          
+              mountPath: /etc/localtime
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kcl-api-svc
+  namespace: api
+  annotations:
+    alb.ingress.kubernetes.io/healthcheck-path: "/aws/health"
+spec:
+  ports:
+  - port: 8080
+    name: http
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: kcl-api
+  type: NodePort

@@ -1,0 +1,23 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kcl-centos
+  namespace : default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kcl-centos
+  template:
+    metadata:
+      labels:
+        app: kcl-centos
+    spec:
+      containers:
+      - image: 1234567890.dkr.ecr.ap-northeast-2.amazonaws.com/centos:latest
+        command: ["/bin/sh", "-c", "sleep 86400"]
+        name: kcl-centos
+        imagePullPolicy: Always
+      dnsPolicy: Default
+
